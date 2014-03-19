@@ -1,0 +1,51 @@
+main_collective             = <%= @main_collective %>
+collectives                 = <%= @subcollectives ? @subcollectives.join(',') : "mcollective" %>
+libdir                      = <%= @libdir %>
+logfile                     = <%= @logfile %>
+loglevel                    = <%= @log_level %>
+daemonize                   = <%= @daemonize %>
+
+identity                    = <%= @fqdn %>
+
+## Plugins
+securityprovider            = ssl
+plugin.ssl_server_private   = <%= @mco_etc %>/ssl/<%= @shared_private_key %> 
+plugin.ssl_server_public    = <%= @mco_etc %>/ssl/<%= @shared_public_key %>
+plugin.ssl_client_cert_dir  = <%= @mco_etc %>/ssl/clients
+plugin.ssl_serializer       = yaml
+
+connector                   = activemq
+plugin.activemq.pool.size   = <%= @activemq_servers.count %>
+<% @activemq_servers.each_with_index do |s, i| -%>
+plugin.activemq.pool.<%= i + 1 %>.host      = <%= s %>
+plugin.activemq.pool.<%= i + 1 %>.port      = <%= @mq_port %>
+plugin.activemq.pool.<%= i + 1 %>.user      = <%= @mq_user %>
+plugin.activemq.pool.<%= i + 1 %>.password  = <%= @mq_pass %>
+plugin.activemq.pool.<%= i + 1 %>.ssl       = <%= @mq_ssl %>
+plugin.activemq.pool.<%= i + 1 %>.ssl.ca    = <%= @ssl_cert_dir %>/certs/ca.pem
+plugin.activemq.pool.<%= i + 1 %>.ssl.key   = <%= @ssl_cert_dir %>/private_keys/<%= @fqdn %>.pem
+plugin.activemq.pool.<%= i + 1 %>.ssl.cert  = <%= @ssl_cert_dir %>/certs/<%= @fqdn %>.pem
+<% end -%>
+
+factsource                  = yaml
+plugin.yaml                 = <%= @mco_etc %>/facts.yaml
+
+classesfile                 = <%= @classfile %>
+
+# Puppet Agent Plugin Configuration
+plugin.puppet.command       = <%= @puppet_bin %> agent
+plugin.puppet.config        = <%= @puppet_config %>
+plugin.puppet.splay         = true
+plugin.puppet.splaylimit    = 120
+plugin.puppet.resource_allow_managed_resources = <%= @puppet_resource_manage %>
+<%- if @puppet_resource_whitelist -%>
+plugin.puppet.resource_type_whitelist = <%= @puppet_resource_whitelist %>
+<%- end -%>
+<%- if @puppet_resource_blacklist -%>
+plugin.puppet.resource_type_blacklist = <%= @puppet_resource_blacklist %>
+<%- end -%>
+
+registration                = agentlist
+registerinterval            = <%= @mco_interval %>
+registration_collective     = <%= @main_collective %>
+direct_addressing           = 1

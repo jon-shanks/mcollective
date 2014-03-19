@@ -1,0 +1,13 @@
+<%=
+
+  obj = scope.to_hash.reject {|k,v| k.to_s =~ /^(uptime.*|rubysitedir|_timestamp|memoryfree.*|swapfree.*|title|name|caller_module_name|module_name|activemq.*|client.*|server.*|ssl_.*|mq.*|shared.*|sshfp.*|agents.*|subcollective.*)$/ }
+
+  arr = obj.sort
+  entry = {}
+  arr.each do |element|
+    entry[element[0]] = element[1]
+  end
+
+  entry.to_yaml
+
+%>
